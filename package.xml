@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hero_chassis_controller</name>
+  <version>0.2.0</version>
+  <description>a hero robot chassis controller based on the rm_template package.</description>
+  <maintainer email="liaoqiayuan@gmail.com">Qiayuan Liao</maintainer>
+  <maintainer email="2891343933@qq.com">CQin-Cat</maintainer>
+  <license>BSD</license>
+  <author email="liaoqiayuan@gmail.com">Original Author:Qiayuan Liao</author>
+  <author email="2891343933@qq.com">CQin-Cat</author>
+
+  <!-- buildtool_depend: dependencies of the build process -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <!-- build_depend: dependencies only used in source files -->
+  <build_depend>boost</build_depend>
+  <!-- depend: build, export, and execution dependency -->
+  <depend>eigen</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+
+  <build_depend>roslint</build_depend>
+</package>
