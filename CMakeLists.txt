@@ -7,15 +7,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## By adding -Wall and -Werror, the compiler does not ignore warnings anymore,
 ## enforcing cleaner code.
-add_definitions(-Wall -Werror)
+
+##add_definitions(-Wall -Werror)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED
-    COMPONENTS
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     sensor_msgs
     roslint
-    )
+    control_toolbox
+    controller_interface
+    hardware_interface
+    realtime_tools
+    pluginlib
+    gazebo_ros
+    control_msgs
+    std_msgs
+    roslaunch
+    controller_manager
+
+)
 
 ## Find system libraries
 find_package(Eigen3 REQUIRED)
@@ -37,10 +48,22 @@ catkin_package(
     ${EIGEN3_INCLUDE_DIR}
     LIBRARIES
     ${PROJECT_NAME}_core
+    hero_chassis_controller
     CATKIN_DEPENDS
-    roscpp
-    sensor_msgs
     DEPENDS
+        roscpp
+        sensor_msgs
+        roslint
+        control_toolbox
+        controller_interface
+        hardware_interface
+        realtime_tools
+        pluginlib
+        gazebo_ros
+        control_msgs
+        std_msgs
+        roslaunch
+        controller_manager
     ## find_package(Eigen3) provides a non standard EIGEN3_INCLUDE_DIR instead of Eigen3_INCLUDE_DIRS.
     ## Therefore, the DEPEND does not work as expected and we need to add the directory to the INCLUDE_DIRS
     # Eigen3
@@ -62,19 +85,26 @@ include_directories(
     ${EIGEN3_INCLUDE_DIR}
     # Set because Boost is an internal dependency, not transitive.
     ${Boost_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/include
 )
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}_core
     src/Algorithm.cpp
-    )
+)
+
 target_compile_features(${PROJECT_NAME}_core INTERFACE cxx_std_11)
 
 ## Declare cpp executables
 add_executable(${PROJECT_NAME}
     src/ros_package_template_node.cpp
     src/RosPackageTemplate.cpp
-    )
+)
+add_executable(chassis_controller_node
+        src/chassis_controller_node.cpp
+        src/chassis_controller.cpp
+)
+
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
 
 ## Add dependencies to exported targets, like ROS msgs or srvs
@@ -89,19 +119,22 @@ add_dependencies(${PROJECT_NAME}
 ## Specify libraries to link executable targets against
 target_link_libraries(${PROJECT_NAME}_core
     ${catkin_LIBRARIES}
-    )
+)
 
 target_link_libraries(${PROJECT_NAME}
     ${PROJECT_NAME}_core
     ${catkin_LIBRARIES}
     )
+target_link_libraries(chassis_controller_node
+        ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
 #############
 
 # Mark executables and/or libraries for installation
-install(
+install(TARGETS chassis_controller_node hero_chassis_controller
     TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_core
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

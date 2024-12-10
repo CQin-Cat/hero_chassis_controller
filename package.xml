@@ -17,6 +17,15 @@
   <depend>eigen</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
-
-  <build_depend>roslint</build_depend>
+  <depend>control_toolbox</depend>
+  <depend>controller_interface</depend>
+  <depend>hardware_interface</depend>
+  <depend>realtime_tools</depend>
+  <depend>pluginlib</depend>
+  <depend>gazebo_ros</depend>
+  <depend>control_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>roslaunch</depend>
+  <depend>roslint</depend>
+  <depend>controller_manager</depend>
 </package>
