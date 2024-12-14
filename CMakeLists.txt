@@ -9,9 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ## enforcing cleaner code.
 
 ##add_definitions(-Wall -Werror)
+add_definitions(-DPLUGINLIB__DISABLE_BOOST_FUNCTIONS)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
+    dynamic_reconfigure
     roscpp
     sensor_msgs
     roslint
@@ -27,7 +29,10 @@ find_package(catkin REQUIRED COMPONENTS
     controller_manager
 
 )
-
+###find_前catkin_后
+#generate_dynamic_reconfigure_options(
+#        cfg/ChassisPidConfig.cfg
+#)
 ## Find system libraries
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED)
@@ -72,6 +77,7 @@ catkin_package(
     ## Dependees do not depend on Boost when they depend on this package.
 )
 
+
 ###########
 ## Build ##
 ###########
@@ -86,13 +92,18 @@ include_directories(
     # Set because Boost is an internal dependency, not transitive.
     ${Boost_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}
 )
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME}_core
     src/Algorithm.cpp
 )
-
+add_library(controller_node_plugin SHARED
+        src/chassis_controller.cpp
+        ${pluginlib_LIBRARIES}
+        ${catkin_LIBRARIES}
+)
 target_compile_features(${PROJECT_NAME}_core INTERFACE cxx_std_11)
 
 ## Declare cpp executables
@@ -100,10 +111,9 @@ add_executable(${PROJECT_NAME}
     src/ros_package_template_node.cpp
     src/RosPackageTemplate.cpp
 )
-add_executable(chassis_controller_node
-        src/chassis_controller_node.cpp
-        src/chassis_controller.cpp
-)
+#add_executable(chassis_controller_node
+#        src/chassis_controller_node.cpp
+#)
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
 
@@ -125,20 +135,29 @@ target_link_libraries(${PROJECT_NAME}
     ${PROJECT_NAME}_core
     ${catkin_LIBRARIES}
     )
-target_link_libraries(chassis_controller_node
+target_link_libraries(controller_node_plugin
         ${catkin_LIBRARIES}
+        ${Boost_LIBRARIES}
 )
+#target_link_libraries(chassis_controller_node
+#        controller_node_plugin
+#        ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
 #############
 
 # Mark executables and/or libraries for installation
-install(TARGETS chassis_controller_node hero_chassis_controller
-    TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_core
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#install(TARGETS chassis_controller_node hero_chassis_controller
+#    TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_core
+#    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#)
+install(
+        TARGETS controller_node_plugin
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 # Mark cpp header files for installation

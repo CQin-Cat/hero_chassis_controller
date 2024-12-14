@@ -1,5 +1,5 @@
 #include<hero_chassis_controller/chassis_controller.h>
-#include<pluginlib/class_list_macros.h>
+
 
 namespace hero_chassis_controller {
 
@@ -17,7 +17,6 @@ namespace hero_chassis_controller {
     {
         pid_controller_ = pid;
 
-        // Get joint handle from hardware interface
         joint_ = robot->getHandle(joint_name);
 
         return true;
@@ -25,27 +24,27 @@ namespace hero_chassis_controller {
 
     bool ChassisPidController::init(hardware_interface::EffortJointInterface *robot, ros::NodeHandle &n)
     {
-        // Get joint name from parameter server
         std::string joint_name;
         if (!n.getParam("joint", joint_name)) {
             ROS_ERROR("No joint given (namespace: %s)", n.getNamespace().c_str());
             return false;
         }//典型的初始化代码，先检测节点是否存在；“”joint“”具体指向应该在yaml文件里面写了，joint_name是为了简单记住名字，避免复制
 
-        // Get joint handle from hardware interface
         joint_ = robot->getHandle(joint_name);
 
-        // Load PID Controller using gains set on parameter server，n有订阅和发布的功能，这里通过在当前命名空间 n 下创建一个子命名空间 "pid"，并将其传递给 PID 控制器以加载对应的参数。
+        //n有订阅和发布的功能，这里通过在当前命名空间 n 下创建一个子命名空间 "pid"，并将其传递给 PID 控制器以加载对应的参数。
         if (!pid_controller_.init(ros::NodeHandle(n, "pid")))
             return false;
 
-        // Start realtime state publisher，n提供了接口给发布者从这里可以看出相比上一个初始化函数，这里可以实现rqt-reconfigure的功能
         controller_state_publisher_.reset(
                 new realtime_tools::RealtimePublisher<control_msgs::JointControllerState>
-                        (n, "state", 1));//该对象发布 control_msgs::JointControllerState 消息，该消息包含了 PID 增益、误差、命令等信息。
+                        (n, "state", 1));//该对象发布 control_msgs::JointControllerState 消息，该消息包含了 PID 增益、误差、命令等信息。可以订阅查看。
 
-        // Start command subscriber，字面意思，就是一个订阅者。setCommandCB是一个CallBack函数，有更新目标值的作用
+        //字面意思，就是一个订阅者。setCommandCB是一个CallBack函数，有更新目标值的作用
         sub_command_ = n.subscribe<std_msgs::Float64>("command", 1, &ChassisPidController::setCommandCB, this);
+
+//        f_ = boost::bind(&ChassisPidController::dynamicReconfigCallback, this, _1, _2);
+//        server_.setCallback(f_);
 
         return true;
     }
@@ -76,13 +75,11 @@ namespace hero_chassis_controller {
         return joint_.getName();
     }
 
-// Set the joint velocity command
-    void ChassisPidController::setCommand()
+    void ChassisPidController::setCommand(double& cmd)
     {
         command_ = cmd;
     }
 
-// Return the current velocity command
     void ChassisPidController::getCommand(double& cmd)
     {
         cmd = command_;
@@ -98,9 +95,6 @@ namespace hero_chassis_controller {
     {
         double error = command_ - joint_.getVelocity();
 
-        // Set the PID error and compute the PID command with nonuniform time
-        // step size. The derivative error is computed from the change in the error
-        // and the timestep dt.
         double commanded_effort = pid_controller_.computeCommand(error, period);
 
         joint_.setCommand(commanded_effort);
@@ -135,6 +129,11 @@ namespace hero_chassis_controller {
     {
         command_ = msg->data;
     }
+
+//    void ChassisPidController::dynamicReconfigCallback(hero_chassis_controller::ChassisPidConfig &config, uint32_t level) {
+//        setGains(config.p, config.i, config.d, config.i_max, config.i_min, config.antiwindup);
+//    }
+
 
     bool EffortChassisController::init(
             hardware_interface::EffortJointInterface *effort_joint_interface,
@@ -187,10 +186,58 @@ namespace hero_chassis_controller {
         back_left_joint_.setCommand(cmd_left_back);
         back_right_joint_.setCommand(cmd_right_back);
     }
+//    MecanumWheelController::MecanumWheelController() : wheel_base_(0.5), track_width_(0.5), wheel_radius_(0.1) {}
+//
+//    MecanumWheelController::~MecanumWheelController() {}
+//
+//    bool MecanumWheelController::init(hardware_interface::VelocityJointInterface* hw, ros::NodeHandle& nh)
+//    {
+//        // 获取四个麦克纳姆轮的关节句柄
+//        left_front_wheel_ = hw->getHandle("left_front_wheel_joint");
+//        right_front_wheel_ = hw->getHandle("right_front_wheel_joint");
+//        left_back_wheel_ = hw->getHandle("left_back_wheel_joint");
+//        right_back_wheel_ = hw->getHandle("right_back_wheel_joint");
+//
+//        // 获取参数
+//        nh.param("wheel_base", wheel_base_, wheel_base_);
+//        nh.param("track_width", track_width_, track_width_);
+//        nh.param("wheel_radius", wheel_radius_, wheel_radius_);
+//
+//        // 订阅 "/cmd_vel" 话题
+//        cmd_vel_sub_ = nh.subscribe("/cmd_vel", 1, &MecanumWheelController::cmdVelCallback, this);
+//
+//        return true;
+//    }
+//
+//    void MecanumWheelController::update(const ros::Time& time, const ros::Durat我们直接从 `cmd_vel` 获取速度指令
+//    }
+//
+//    void MecanumWheelController::cmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg)
+//    {
+//        // 获取速度指令
+//        double vx = msg->linear.x;  // 前进速度
+//        double vy = msg->linear.y;  // 侧向速度
+//        double omega = msg->angular.z;  // 旋转速度
+//
+//        // 计算四个轮子的期望转速
+//        double v1 = (1 / wheel_radius_) * (vx - vy - (wheel_base_ + track_width_) * omega);
+//        double v2 = (1 / wheel_radius_) * (vx + vy + (wheel_base_ + track_width_) * omega);
+//        double v3 = (1 / wheel_radius_) * (vx + vy - (wheel_base_ + track_width_) * omega);
+//        double v4 = (1 / wheel_radius_) * (vx - vy + (wheel_base_ + track_width_) * omega);
+//
+//        // 设置每个麦克纳姆轮的转速
+//        left_front_wheel_.setCommand(v1);
+//        right_front_wheel_.setCommand(v2);
+//        left_back_wheel_.setCommand(v3);
+//        right_back_wheel_.setCommand(v4);
+//    }ion& period)
+//    {
+//        // 在这里你可以根据计算的期望转速来设置轮子速度
+//        // 此示例不进行计算，假设
 
-} // namespace
-
-PLUGINLIB_EXPORT_CLASS( hero_chassis_controller::ChassisPidController, controller_interface::ControllerBase)
+}
+PLUGINLIB_EXPORT_CLASS( hero_chassis_controller::EffortChassisController, controller_interface::ControllerBase)
+//PLUGINLIB_EXPORT_CLASS(hero_chassis_controller::MecanumWheelController, controller_interface::ControllerBase)
 
 
 //

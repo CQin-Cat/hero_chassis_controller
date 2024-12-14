@@ -27,5 +27,9 @@
   <depend>std_msgs</depend>
   <depend>roslaunch</depend>
   <depend>roslint</depend>
+  <depend>dynamic_reconfigure</depend>
   <depend>controller_manager</depend>
+  <export>
+    <controller_interface plugin="${prefix}/hero_chassis_controller_plugins.xml"/>
+  </export>
 </package>

@@ -1,0 +1,14 @@
+<library path="lib/libhero_chassis_controller">
+
+    <class name="hero_chassis_controller/EffortChassisController"
+           type="hero_chassis_controller::EffortChassisController"
+           base_class_type="controller_interface::ControllerBase"/>
+    <class name="hero_chassis_controller/MecanumWheelController"
+           type="mecanum_wheel_controller::MecanumWheelController"
+           base_class_type="controller_interface::ControllerBase">
+        <description>
+
+        </description>
+    </class>
+
+</library>
