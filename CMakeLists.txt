@@ -27,6 +27,9 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     roslaunch
     controller_manager
+    geometry_msgs
+    tf
+    nav_msgs
 
 )
 ###find_前catkin_后
@@ -69,6 +72,9 @@ catkin_package(
         std_msgs
         roslaunch
         controller_manager
+        geometry_msgs
+        tf
+        nav_msgs
     ## find_package(Eigen3) provides a non standard EIGEN3_INCLUDE_DIR instead of Eigen3_INCLUDE_DIRS.
     ## Therefore, the DEPEND does not work as expected and we need to add the directory to the INCLUDE_DIRS
     # Eigen3
@@ -99,8 +105,14 @@ include_directories(
 add_library(${PROJECT_NAME}_core
     src/Algorithm.cpp
 )
-add_library(controller_node_plugin SHARED
-        src/chassis_controller.cpp
+#add_library(controller_node_plugin SHARED
+#        src/chassis_controller.cpp
+#        ${pluginlib_LIBRARIES}
+#        ${catkin_LIBRARIES}
+#)
+
+add_library(kinematics_plugin SHARED
+        src/kinematics_controller.cpp
         ${pluginlib_LIBRARIES}
         ${catkin_LIBRARIES}
 )
@@ -135,7 +147,11 @@ target_link_libraries(${PROJECT_NAME}
     ${PROJECT_NAME}_core
     ${catkin_LIBRARIES}
     )
-target_link_libraries(controller_node_plugin
+#target_link_libraries(controller_node_plugin
+#        ${catkin_LIBRARIES}
+#        ${Boost_LIBRARIES}
+#)
+target_link_libraries(kinematics_plugin
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
 )
@@ -155,11 +171,14 @@ target_link_libraries(controller_node_plugin
 #    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)
+#install(
+#        TARGETS controller_node_plugin
+#        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#)
 install(
-        TARGETS controller_node_plugin
+        TARGETS kinematics_plugin
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
-
 # Mark cpp header files for installation
 install(
     DIRECTORY include/${PROJECT_NAME}/

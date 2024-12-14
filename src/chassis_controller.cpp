@@ -139,12 +139,12 @@ namespace hero_chassis_controller {
             hardware_interface::EffortJointInterface *effort_joint_interface,
             ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh) {
         front_left_joint_ =
-                effort_joint_interface->getHandle("left_front_wheel_joint");
+                effort_joint_interface->getHandle("hero::left_front_wheel_joint");
         front_right_joint_ =
-                effort_joint_interface->getHandle("right_front_wheel_joint");
-        back_left_joint_ = effort_joint_interface->getHandle("left_back_wheel_joint");
+                effort_joint_interface->getHandle("hero::right_front_wheel_joint");
+        back_left_joint_ = effort_joint_interface->getHandle("hero::left_back_wheel_joint");
         back_right_joint_ =
-                effort_joint_interface->getHandle("right_back_wheel_joint");
+                effort_joint_interface->getHandle("hero::right_back_wheel_joint");
         if (!front_left_pid_controller_.init(effort_joint_interface, controller_nh)) {
             ROS_ERROR("Failed to initialize front left wheel Pid Controller.");
             return false;

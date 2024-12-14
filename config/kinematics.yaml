@@ -1,0 +1,5 @@
+hero_chassis_controller:
+  type: "hero_chassis_controller/KinematicsController"
+  wheel_radius: 0.05     # 轮子半径
+  wheel_base: 0.4        # 轴距
+  wheel_track: 0.3       # 轮距

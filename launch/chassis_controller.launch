@@ -4,16 +4,12 @@
     <arg name="roller_type" value="realistic"/>
     <arg name="paused" value="true"/>
   </include>
-<!--   <gazebo> -->
-<!--     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"> -->
-<!--     <robotNamespace>hero</robotNamespace> -->
-<!--     </plugin> -->
-<!--   </gazebo> -->
 
   <rosparam file="$(find hero_chassis_controller)/config/controller.yaml" command="load"/>
   <!-- load the controllers -->
 <node name="controller_manager" pkg="controller_manager" type="controller_manager" ns="hero"/>
-<node name="controller_spawner" pkg="controller_manager" type="spawner" ns="hero" args="hero_chassis_controller/EffortChassisController"/>
+<!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" ns="hero" args="hero_chassis_controller/EffortChassisController"/> -->
+<node name="controller_spawner" pkg="controller_manager" type="spawner" ns="hero" args="hero_chassis_controller"/>
 
   <!--<node name="chassis_controller_node" pkg="hero_chassis_controller" type="chassis_controller_node" />-->
 
