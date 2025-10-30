@@ -12,7 +12,7 @@ I remade it before the final assessment of Season 2026 began.
 The source code is released under a [BSD 3-Clause license](LICENSE).
 
 **Author: cqincat<br />
-Affiliation: [Dynamicx]()<br />
+Affiliation: GDUT<br />
 Maintainer: cqincat, 2891343933@qq.com**
 
 The simple_chassis_controller package has been tested under [ROS] Noetic on respectively 18.04 and 20.04. This is
@@ -55,11 +55,13 @@ Control the chassis with:
 
 ### Config folder /config
 
-* **controllers.yaml**  Params of hero_chassis_controller and joint_state_controller.
+* **controllers.yaml**  
+    Params of hero_chassis_controller and joint_state_controller.
 
 ### Config folder /cfg
 
-* **PID.cfg**  Params of PID.
+* **PID.cfg**  
+    Params of PID.
 
 ## Launch files
 
